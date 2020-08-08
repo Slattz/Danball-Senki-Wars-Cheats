@@ -1,0 +1,86 @@
+//------------------------------------------------
+//--- 010 Editor v10.0 Binary Template
+//
+//      File: DSW_savefile.bt
+//   Authors: Slattz
+//   Version: 0.1
+//   Purpose: RE of Danball Senki Wars Save Structure
+// File Mask: sv1.bin, sv2.bin
+//------------------------------------------------
+
+typedef ubyte bool;
+typedef ubyte u8;
+typedef uint16 u16;
+typedef uint32 u32;
+typedef uint64 u64;
+typedef byte s8;
+typedef int16 s16;
+typedef int32 s32;
+typedef int64 s64;
+
+//STRUCTS
+typedef struct Time_s {
+    u32 Year;
+    u8 Month;
+    u8 Day;
+    u8 Unknown;
+    u8 Hour;
+    u8 Minute;
+    u8 Unknown1;
+    u16 Unknown2;
+};
+
+typedef struct Item_s {
+    u8 Amount;
+    u8 BoughtStatus <comment="0x1: Bought; 0x2: Not Bought; 0x3: Bought First Time ('New' text)">;
+};
+
+//Seems to be a bigger version of the above for some reason
+typedef struct ItemBig_s {
+    u8 Amount;
+    u8 BoughtStatus <comment="0x1: Bought; 0x2: Not Bought; 0x3: Bought First Time ('New' text); 0xA: Unk; 0x9: Unk">;
+    u16 unk_ID;
+};
+
+typedef struct SaveStruct
+{
+    //Strings all use char32_t, but 010 doesn't support it ; workaround is wchar_t and array size * 2
+    wchar_t HouseStr[10*2] <comment="All Strings seem to use a weird (custom?) charset...">;
+    u32  HouseStrLimiter <format=hex, comment="Shows the end of the house str?">;
+    wchar_t PlayerName[10*2];
+    u32  PlayerNameLimiter <format=hex, comment="Shows the end of the player name str?">;
+    u16 HouseDaysActive;
+    u8 Voice : 4 <comment="Chosen at start">;
+    u8 Avatar : 4 <comment="Chosen at start">;
+    u8 PlayerLevel;
+    Time_s LastSave <comment="Last time you saved">;
+    u32 Money <comment="99999999 is max in the code">;
+    u32 BlueBarNumber_unk <comment="Number in blue bar underneath player name on selection screen">;
+    u64 PlayTime <comment="In Seconds">;
+    u32 unk1[7];
+    Time_s creationTime <comment="Time the save was made">;
+    u16 unk2;
+    u16 unk3;
+    u32 unk4;
+    wchar_t HouseStr_2[10*2];
+    u32  HouseStrLimiter_2 <format=hex, comment="Shows the end of the house str?">;
+    wchar_t PlayerName_2[10*2];
+    u32  PlayerNameLimiter_2 <format=hex, comment="Shows the end of the player name str?">;
+
+    u8 Unk2[4];
+    u32 Unk3[3];
+    u32 Money_2 <comment="Might be total money collected throughout the save?">;
+    u32 Unk4;
+    u32 Unk5;
+    u32 Unk6;
+    
+    Item_s Items_Parts[1952];
+    ItemBig_s BigItems[6211];
+    ItemBig_s WeirdItems[1588];
+    Item_s Items_unk[323];
+    u16 padding;
+    u32 lol;
+};
+
+//main
+SaveStruct Save;
