@@ -1,0 +1,19 @@
+Author: Slattz
+
+Version: # Plugin version
+    Major: 1
+    Minor: 0
+    Revision: 0
+
+Targets: 0 # Low TitleId of games which are compatibles with this plugin (0 for all)
+
+Title: Danball Senki Wars Plugin
+
+Summary: A CTRPF Plugin for Danball Senki Wars
+
+Description: |
+  Commissioned by PHotman
+
+  Features:
+    - All Parts
+    - Easy Friendship Levels
