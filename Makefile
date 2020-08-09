@@ -23,13 +23,13 @@ FTP_PATH	:=	"luma/plugins/"
 #---------------------------------------------------------------------------------
 ARCH		:=	-march=armv6k -mlittle-endian -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS		:=	-Os -mword-relocations \
+CFLAGS		:=	-g -Os -mword-relocations \
 				-fomit-frame-pointer -ffunction-sections -fno-strict-aliasing \
-				$(ARCH)
+				$(ARCH) -fno-exceptions
 
 CFLAGS		+=	$(INCLUDE) -DARM11 -D_3DS 
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
 
 ASFLAGS		:= $(ARCH)
 LDFLAGS		:= -T $(TOPDIR)/3gx.ld $(ARCH) -Os -Wl,--gc-sections,--strip-discarded,--strip-debug
@@ -94,7 +94,9 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(OUTPUT).3gx : $(OFILES)
+$(OUTPUT).3gx : $(OUTPUT).elf
+
+$(OUTPUT).elf: $(OFILES)
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data

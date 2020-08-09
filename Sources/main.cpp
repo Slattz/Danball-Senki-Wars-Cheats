@@ -38,9 +38,8 @@ namespace CTRPluginFramework
     void    InitMenu(PluginMenu &menu)
     {
             menu += EntryWithHotkey(new MenuEntry("All Items", AllItems, "Press the hotkeys to give the current save all items"), Hotkey(Key::L | Key::Up, "All items hotkey") );
-            menu += new MenuEntry("EXP Rate Modifier", nullptr, ExpGainEditor, "Change the EXP rate using the keyboard icon");
-        // Create your entries here, or elsewhere
-        // You can create your entries whenever/wherever you feel like it
+            menu += new MenuEntry("General EXP Rate Modifier (Current: x1)", nullptr, ExpGainEditor, "Change the General EXP rate using the keyboard icon!");
+            menu += new MenuEntry("Friend EXP Rate Modifier (Current: x1)", nullptr, FriendExpGainEditor, "Change the Friend EXP rate using the keyboard icon!");
     }
  
     int     main(void)

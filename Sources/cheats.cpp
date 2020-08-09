@@ -79,26 +79,102 @@ void AllItems(MenuEntry *entry) {
         btn = false;
 }
 
+#define MIN_EXP 1
+#define MAX_EXP 100
+
+bool CheckExpInput(const void *input, std::string &error) {
+        int in = *static_cast<const int *>(input);
+        if (in >= MIN_EXP && in <= MAX_EXP)
+            return true;
+
+        error = "The value must be between " TOSTRING(MIN_EXP) " and " TOSTRING(MAX_EXP);
+        return false;
+}
+
+//GENERAL EXP
+#define EXP_HOOK_ADDR 0x318950
+
+u8 g_expMultiplier = 1;
+
+void __attribute__((naked)) ExpMultiplier(void) {
+    __asm__ __volatile__(
+        "STMFD  SP!, {R3}       \n\t"
+        "LDR    R3, =g_expMultiplier     \n\t"
+        "LDRB   R3, [R3]        \n\t"
+        "MUL    R0, R0, R3      \n\t" //R0 is the exp to gain
+        "LDMFD  SP!, {R3}       \n\t"
+        "BX LR                  \n\t"
+    );
+}
+
 void ExpGainEditor(MenuEntry *entry) {
-    return;
+    static Hook* hook = nullptr;
+    if (hook == nullptr) {
+        hook = new Hook;
+        hook->Initialize(EXP_HOOK_ADDR, (u32)&ExpMultiplier);
+    }
 
-    Keyboard keyboard("Which exp rate would you like to use?");
-    static std::vector<std::string> list = {
-        "x1 (Normal)",
-        "x2",
-        "x3",
-        "x5",
-        "x10",
-        "x20",
-        "x25",
-        "x50",
-        "x75",
-        "x100"
-    };
-    keyboard.Populate(list);
-    int userChoice = keyboard.Open();
+    Keyboard keyboard(Utils::Format("Enter an exp multiplier between\n" TOSTRING(MIN_EXP) " (Normal) and " TOSTRING(MAX_EXP) ".\n\n\nCurrent General EXP Modifier: x%d", g_expMultiplier));
+    keyboard.IsHexadecimal(false);
+    keyboard.SetCompareCallback(CheckExpInput);
 
-    if (userChoice != -1) {
-        //DO HOOK SYSTEM HERE
+    int ret = keyboard.Open(g_expMultiplier, g_expMultiplier);
+    if (ret != -1) {
+        if (g_expMultiplier < MIN_EXP || g_expMultiplier > MAX_EXP)
+            g_expMultiplier = MIN_EXP;
+
+        if (g_expMultiplier == MIN_EXP) {
+            hook->Disable();
+        }
+
+        else {
+            hook->Enable();
+        }
+
+        entry->Name() = Utils::Format("General EXP Rate Modifier (Current: x%d)", g_expMultiplier);
     }
 }
+
+// FRIENDSHIP EXP
+#define FRIEND_EXP_HOOK_ADDR 0X318740
+
+u8 g_friendExpMultiplier = 1;
+void __attribute__((naked)) FriendExpMultiplier(void) {
+    __asm__ __volatile__(
+        "STMFD  SP!, {R2}       \n\t"
+        "LDR    R2, =g_friendExpMultiplier     \n\t"
+        "LDRB   R2, [R2]        \n\t"
+        "MUL    R3, R3, R2      \n\t" //R0 is the exp to gain
+        "LDMFD  SP!, {R2}       \n\t"
+        "BX LR                  \n\t"
+    );
+}
+
+void FriendExpGainEditor(MenuEntry *entry) {
+    static Hook* hook = nullptr;
+    if (hook == nullptr) {
+        hook = new Hook;
+        hook->Initialize(FRIEND_EXP_HOOK_ADDR, (u32)&FriendExpMultiplier);
+    }
+
+    Keyboard keyboard(Utils::Format("Enter an exp multiplier between\n" TOSTRING(MIN_EXP) " (Normal) and " TOSTRING(MAX_EXP) ".\n\n\nCurrent Friend EXP Modifier: x%d", g_friendExpMultiplier));
+    keyboard.IsHexadecimal(false);
+    keyboard.SetCompareCallback(CheckExpInput);
+
+    int ret = keyboard.Open(g_friendExpMultiplier, g_friendExpMultiplier);
+    if (ret != -1) {
+        if (g_friendExpMultiplier < MIN_EXP || g_friendExpMultiplier > MAX_EXP)
+            g_friendExpMultiplier = MIN_EXP;
+
+        if (g_friendExpMultiplier == MIN_EXP) {
+            hook->Disable();
+        }
+
+        else {
+            hook->Enable();
+        }
+
+        entry->Name() = Utils::Format("Friend EXP Rate Modifier (Current: x%d)", g_friendExpMultiplier);
+    }
+}
+
