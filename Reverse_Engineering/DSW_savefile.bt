@@ -42,6 +42,32 @@ typedef struct ItemBig_s {
     u16 unk_ID;
 };
 
+typedef struct CharacterLBX_s {
+    u16 EXP;
+    u16 Level;
+};
+
+typedef struct CharacterStats_s {
+    u32 unk_ID;
+    u32 unk1;
+    u32 unk2;
+    u32 XPGained <comment="Function @ 0x3188B4 in v1.0 code used for calc'ing xp gained and updating xp and level">;
+    s16 Level <comment="Max is 200 @ 0x318948 in the 1.0 code">;
+    u16 unk7;
+    u16 Friendship_XP;
+    u16 Friendship_Level;
+    u32 Unk4;
+    u32 Padding1;
+    u16 Padding2;
+    u16 Unk5;
+    u8 Unk6[28];
+    CharacterLBX_s LBX_Striker;
+    CharacterLBX_s LBX_Knight;
+    CharacterLBX_s LBX_Balance;
+    CharacterLBX_s LBX_Wild;
+    u8 Unk7[8];
+};
+
 typedef struct SaveStruct
 {
     //Strings all use char32_t, but 010 doesn't support it ; workaround is wchar_t and array size * 2
@@ -52,7 +78,7 @@ typedef struct SaveStruct
     u16 HouseDaysActive;
     u8 Voice : 4 <comment="Chosen at start">;
     u8 Avatar : 4 <comment="Chosen at start">;
-    u8 PlayerLevel;
+    u8 PlayerLevel <comment="Max is 200 @ 0x318948 in the 1.0 code">;
     Time_s LastSave <comment="Last time you saved">;
     u32 Money <comment="99999999 is max in the code">;
     u32 BlueBarNumber_unk <comment="Number in blue bar underneath player name on selection screen">;
@@ -78,7 +104,10 @@ typedef struct SaveStruct
     ItemBig_s BigItems[6211];
     ItemBig_s WeirdItems[1588];
     Item_s Items_unk[323];
-    u16 padding;
+
+    u16 padding1;
+    u32 padding2;
+    CharacterStats_s Characters[45];
     u32 lol;
 };
 
