@@ -73,6 +73,8 @@ void AllItems(MenuEntry *entry) {
         #ifdef DEBUG
         MessageBox(Utils::Format("Orig: %X, Current: %X\nExpected Diff: 0x8BA2\nActual Diff: %X", orig, offset, offset-orig))();
         #endif
+
+        OSD::Notify("All Items received!");
     }
 
     if (!entry->Hotkeys[0].IsDown())
@@ -101,7 +103,7 @@ void __attribute__((naked)) ExpMultiplier(void) {
         "STMFD  SP!, {R3}       \n\t"
         "LDR    R3, =g_expMultiplier     \n\t"
         "LDRB   R3, [R3]        \n\t"
-        "MUL    R0, R0, R3      \n\t" //R0 is the exp to gain
+        "MUL    R0, R0, R3      \n\t" //R0 is the general exp to gain
         "LDMFD  SP!, {R3}       \n\t"
         "BX LR                  \n\t"
     );
@@ -131,7 +133,7 @@ void ExpGainEditor(MenuEntry *entry) {
             hook->Enable();
         }
 
-        entry->Name() = Utils::Format("General EXP Rate Modifier (Current: x%d)", g_expMultiplier);
+        entry->Name() = Utils::Format("General EXP Multiplier (Current: x%d)", g_expMultiplier);
     }
 }
 
@@ -144,7 +146,7 @@ void __attribute__((naked)) FriendExpMultiplier(void) {
         "STMFD  SP!, {R2}       \n\t"
         "LDR    R2, =g_friendExpMultiplier     \n\t"
         "LDRB   R2, [R2]        \n\t"
-        "MUL    R3, R3, R2      \n\t" //R0 is the exp to gain
+        "MUL    R3, R3, R2      \n\t" //R3 is the friend exp to gain
         "LDMFD  SP!, {R2}       \n\t"
         "BX LR                  \n\t"
     );
@@ -174,7 +176,7 @@ void FriendExpGainEditor(MenuEntry *entry) {
             hook->Enable();
         }
 
-        entry->Name() = Utils::Format("Friend EXP Rate Modifier (Current: x%d)", g_friendExpMultiplier);
+        entry->Name() = Utils::Format("Friend EXP Multiplier (Current: x%d)", g_friendExpMultiplier);
     }
 }
 
