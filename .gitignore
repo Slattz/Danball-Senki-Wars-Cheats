@@ -1,4 +1,4 @@
 /Build
 *.3gx
 /.vscode
-*.firm
+*.elf
