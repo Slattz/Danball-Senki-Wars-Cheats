@@ -5,14 +5,14 @@
 
 //See savefile.bt for actual save structure
 enum Offsets : u32 {
-    Offsets_Items = 0x120
+    Offsets_Items = 0x118
 };
 
 enum Sizes : u32 {
-    Sizes_Item_Parts = 1952,
+    Sizes_Item_Parts = 1956,
     Sizes_BigItems = 6211,
-    Sizes_WeirdItems = 1588,
-    Sizes_Items_unk = 323
+    Sizes_WeirdItems = 1589,
+    Sizes_Items_unk = 321
 };
 
 u32 GetSaveOffset() {
@@ -44,7 +44,7 @@ void AllItems(MenuEntry *entry) {
             offset += 2; //sizeof(CompleteItem)
         }
 
-        //fill Items_Parts
+        //fill Items_LBXItems
         for (u32 i = 0; i < Sizes_BigItems; i++) {
             u32 val = 0;
             Process::Read32(offset, val);
@@ -54,7 +54,7 @@ void AllItems(MenuEntry *entry) {
             offset += 4; //sizeof(val)
         }
 
-        //fill Items_Parts
+        //fill WeirdItems
         for (u32 i = 0; i < Sizes_WeirdItems; i++) {
             u32 val = 0;
             Process::Read32(offset, val);
@@ -64,7 +64,7 @@ void AllItems(MenuEntry *entry) {
             offset += 4; //sizeof(val)
         }
 
-        //fill Items_Parts
+        //fill Items_unk
         for (u32 i = 0; i < Sizes_Items_unk; i++) {
             Process::Write16(offset, CompleteItem);
             offset += 2; //sizeof(CompleteItem)
