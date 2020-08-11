@@ -68,6 +68,18 @@ typedef struct CharacterStats_s {
     u8 Unk7[8];
 };
 
+typedef struct LBXItem_s {
+    u16 Index <comment="0 means empty slot">;
+    u16 ItemID <format=hex>;
+    u16 unk_num <comment="always 1?">;
+    u16 unk2_FFFF;
+    u16 Modifier1;
+    u16 Modifier2;
+    u16 Modifier3;
+    u16 Modifier4;
+    u16 unk5_FFFF;
+};
+
 typedef struct SaveStruct
 {
     //Strings all use char32_t, but 010 doesn't support it ; workaround is wchar_t and array size * 2
@@ -96,18 +108,29 @@ typedef struct SaveStruct
     u8 Unk2[4];
     u32 Unk3[3];
     u32 Money_2 <comment="Might be total money collected throughout the save?">;
-    u32 Unk4;
-    u32 Unk5;
-    u32 Unk6;
-    
-    Item_s Items_Parts[1952];
-    ItemBig_s BigItems[6211];
-    ItemBig_s WeirdItems[1588];
-    Item_s Items_unk[323];
+    u32 Unk4;    
+
+    Item_s Items_Parts[1956];
+    ItemBig_s Items_LBXItems[5229];
+    ItemBig_s Items_Unk1Items[982];
+    ItemBig_s Items_Unk2Items[1589];
+    Item_s Items_unk[321];
 
     u16 padding1;
     u32 padding2;
-    CharacterStats_s Characters[45];
+    CharacterStats_s Characters[52];
+    u8 unk5[0xFEC];
+
+    //The game seems to only ever use 224 of the 256 available (@0x237DF8 in the code)
+    LBXItem_s LBX_BodyItems[256];
+    LBXItem_s LBX_BootItems[256];
+    LBXItem_s LBX_HeadItems[256];
+    LBXItem_s LBX_RighthandItems[256];
+    LBXItem_s LBX_LefthandItems[256];
+
+    u8 unk55[0x25F8];
+    u32 LBXItem_Amounts[5] <comment="1 amount per item category">;
+    //0x12E8C is array of how many items per category we have
     u32 lol;
 };
 
