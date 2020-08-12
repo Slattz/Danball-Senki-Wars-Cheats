@@ -24,27 +24,20 @@ namespace CTRPluginFramework
 
     // This function is called before main and before the game starts
     // Useful to do code edits safely
-    void    PatchProcess(FwkSettings &settings)
-    {
-    }
+    void    PatchProcess(FwkSettings &settings) { }
 
     // This function is called when the process exits
     // Useful to save settings, undo patchs or clean up things
-    void    OnProcessExit(void)
-    {
+    void    OnProcessExit(void) { }
 
-    }
-
-    void    InitMenu(PluginMenu &menu)
-    {
+    void    InitMenu(PluginMenu &menu) {
         menu += new MenuEntry("Shop Is Free", ShopIsFree, "Enabling this cheat makes everything in the shop free and also disregards LBX Crafting Level when buying");
         menu += new MenuEntry("All Items", AllItems, "Enable the cheat to give yourself all items.\n\nNote: for LBX items, this only unlocks them in the shop.\nUse \'Shop Is Free\' to buy them.");
         menu += new MenuEntry("General EXP Multiplier (Current: x1)", nullptr, ExpGainEditor, "Change the General EXP rate using the keyboard icon!");
         menu += new MenuEntry("Friend EXP Multiplier (Current: x1)", nullptr, FriendExpGainEditor, "Change the Friend EXP rate using the keyboard icon!");
     }
  
-    int     main(void)
-    {
+    int main(void) {
         PluginMenu *menu = new PluginMenu("Danball Senki Wars Plugin", 1, 0, 1, \
                                           "A CTRPF Plugin for Danball Senki Wars\nRequested by PHotman\nMade by Slattz");
 

@@ -1,38 +1,5 @@
 #include "cheats.hpp"
 
-//#define DEBUG
-#define SAVE_PTR 0x654010
-
-//See savefile.bt for actual save structure
-enum Offsets : u32 {
-    Offsets_Items = 0x118,
-    Offsets_LBXInv = 0xAE94,
-    Offsets_LBXItemArray = 0x12E8C
-};
-
-enum Sizes : u32 {
-    Sizes_Item_Parts = 1956,
-    Sizes_BigItems = 5229,
-    Sizes_Unk1Items = 982,
-    Sizes_Unk2Items = 1589,
-    Sizes_Items_unk = 321,
-
-    Sizes_LBXItemArray = 0x1200,
-};
-
-struct PACKED LBXItem_s {
-    u16 Index;
-    u16 ItemID;
-    u16 unk_num;
-    u16 unk2_FFFF;
-    u16 Modifier1;
-    u16 Modifier2;
-    u16 Modifier3;
-    u16 Modifier4;
-    u16 unk5_FFFF;
-};
-static_assert(sizeof(LBXItem_s) == 0x12, "LBXItem_s is incorrect size");
-
 u32 GetSaveOffset() {
     u32 offset = 0;
     if (Process::Read32(SAVE_PTR, offset))
@@ -147,9 +114,6 @@ void AllItems(MenuEntry *entry) {
     }
 }
 
-#define MIN_EXP 1
-#define MAX_EXP 100
-
 bool CheckExpInput(const void *input, std::string &error) {
         int in = *static_cast<const int *>(input);
         if (in >= MIN_EXP && in <= MAX_EXP)
@@ -160,8 +124,6 @@ bool CheckExpInput(const void *input, std::string &error) {
 }
 
 //GENERAL EXP
-#define EXP_HOOK_ADDR 0x318950
-
 u8 g_expMultiplier = 1;
 
 void __attribute__((naked)) ExpMultiplier(void) {
@@ -176,10 +138,12 @@ void __attribute__((naked)) ExpMultiplier(void) {
 }
 
 void ExpGainEditor(MenuEntry *entry) {
+    constexpr const u32 off_Hook_GeneralEXP = 0x318950;
+
     static Hook* hook = nullptr;
     if (hook == nullptr) {
         hook = new Hook;
-        hook->Initialize(EXP_HOOK_ADDR, (u32)&ExpMultiplier);
+        hook->Initialize(off_Hook_GeneralEXP, (u32)&ExpMultiplier);
     }
 
     Keyboard keyboard(Utils::Format("Enter an exp multiplier between\n" TOSTRING(MIN_EXP) " (Normal) and " TOSTRING(MAX_EXP) ".\n\n\nCurrent General EXP Modifier: x%d", g_expMultiplier));
@@ -204,8 +168,6 @@ void ExpGainEditor(MenuEntry *entry) {
 }
 
 // FRIENDSHIP EXP
-#define FRIEND_EXP_HOOK_ADDR 0X318740
-
 u8 g_friendExpMultiplier = 1;
 void __attribute__((naked)) FriendExpMultiplier(void) {
     __asm__ __volatile__(
@@ -219,10 +181,12 @@ void __attribute__((naked)) FriendExpMultiplier(void) {
 }
 
 void FriendExpGainEditor(MenuEntry *entry) {
+    constexpr const u32 off_Hook_FriendshipEXP = 0x318740;
+
     static Hook* hook = nullptr;
     if (hook == nullptr) {
         hook = new Hook;
-        hook->Initialize(FRIEND_EXP_HOOK_ADDR, (u32)&FriendExpMultiplier);
+        hook->Initialize(off_Hook_FriendshipEXP, (u32)&FriendExpMultiplier);
     }
 
     Keyboard keyboard(Utils::Format("Enter an exp multiplier between\n" TOSTRING(MIN_EXP) " (Normal) and " TOSTRING(MAX_EXP) ".\n\n\nCurrent Friend EXP Modifier: x%d", g_friendExpMultiplier));
@@ -247,25 +211,28 @@ void FriendExpGainEditor(MenuEntry *entry) {
 }
 
 void ShopIsFree(MenuEntry *entry) {
+    constexpr const u32 off_PriceZero = 0x2B8BAC;
+    constexpr const u32 off_IgnoreCraftLevel = 0x2B8C0C;
+
     static bool active = false;
     if (entry->WasJustActivated() && !active) {
         //Changes code to set all prices to 0 and bypasses the money required check
-        Process::Patch(0x2B8BAC, 0xE3A00000); //MOV R0, #0
-        Process::Patch(0x2B8BB0, 0xE5840008); //STR R0, [R4,#8]
+        Process::Patch(off_PriceZero, 0xE3A00000); //MOV R0, #0
+        Process::Patch(off_PriceZero+4, 0xE5840008); //STR R0, [R4,#8]
 
         //Changes code to not care about 'lbx crafting level'
-        Process::Patch(0x2B8C0C, 0xE3C00040); //BIC R0, R0, #0x40
+        Process::Patch(off_IgnoreCraftLevel, 0xE3C00040); //BIC R0, R0, #0x40
         OSD::Notify("Shop Is Free: " << Color::Green << "Enabled!");
         active = true;
     }
 
     else if (!entry->IsActivated() && active) {
         //unpatch 'price is 0'
-        Process::Patch(0x2B8BAC, 0xE1500001); //CMP R0, R1
-        Process::Patch(0x2B8BB0, 0xAA000002); //BGE #0x10
+        Process::Patch(off_PriceZero, 0xE1500001); //CMP R0, R1
+        Process::Patch(off_PriceZero+4, 0xAA000002); //BGE #0x10
 
         //unpatch 'lbx crafting level doesnt matter'
-        Process::Patch(0x2B8C0C, 0xE3800040); //ORR R0, R0, #0x40
+        Process::Patch(off_IgnoreCraftLevel, 0xE3800040); //ORR R0, R0, #0x40
         OSD::Notify("Shop Is Free: " << Color::Red << "Disabled!");
         active = false;
     }
