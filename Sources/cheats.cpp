@@ -42,7 +42,7 @@ u32 GetSaveOffset() {
 }
 
 u32 g_SetupAddLBXPartsAddr = 0x2BDBD8;
-u8 __attribute__((naked)) _SetupAddLBXParts(u32 unused, u32 Item, u32 unk_ptr) {
+void __attribute__((naked)) _SetupAddLBXParts(u32 unused, u32 Item, u32 unk_ptr) {
     __asm__ __volatile__(
         "STMFD  SP!, {R3-R12,LR}   	         \n\t" //Store All Registers except R0 (Unused), R1 (Item), R2 (unknown not required pointer)
         "LDR   	R3, =g_SetupAddLBXPartsAddr  \n\t" //Set game address
@@ -52,7 +52,7 @@ u8 __attribute__((naked)) _SetupAddLBXParts(u32 unused, u32 Item, u32 unk_ptr) {
     );
 }
 
-u8 SetupAddLBXParts(u32 Item) {
+void SetupAddLBXParts(u32 Item) {
     _SetupAddLBXParts(0, Item, 0);
 }
 
@@ -238,5 +238,30 @@ void FriendExpGainEditor(MenuEntry *entry) {
         }
 
         entry->Name() = Utils::Format("Friend EXP Multiplier (Current: x%d)", g_friendExpMultiplier);
+    }
+}
+
+void ShopIsFree(MenuEntry *entry) {
+    static bool active = false;
+    if (entry->WasJustActivated() && !active) {
+        //Changes code to set all prices to 0 and bypasses the money required check
+        Process::Patch(0x2B8BAC, 0xE3A00000); //MOV R0, #0
+        Process::Patch(0x2B8BB0, 0xE5840008); //STR R0, [R4,#8]
+
+        //Changes code to not care about 'lbx crafting level'
+        Process::Patch(0x2B8C0C, 0xE3C00040); //BIC R0, R0, #0x40
+        OSD::Notify("Shop Is Free: " << Color::Green << "Enabled!");
+        active = true;
+    }
+
+    else if (!entry->IsActivated() && active) {
+        //unpatch 'price is 0'
+        Process::Patch(0x2B8BAC, 0xE1500001); //CMP R0, R1
+        Process::Patch(0x2B8BB0, 0xAA000002); //BGE #0x10
+
+        //unpatch 'lbx crafting level doesnt matter'
+        Process::Patch(0x2B8C0C, 0xE3800040); //ORR R0, R0, #0x40
+        OSD::Notify("Shop Is Free: " << Color::Red << "Disabled!");
+        active = false;
     }
 }

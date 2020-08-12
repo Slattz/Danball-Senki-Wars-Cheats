@@ -9,5 +9,6 @@ using namespace CTRPluginFramework;
 #define TOSTRING(x)         STRINGIFY(x)
 
 void AllItems(MenuEntry *entry);
+void ShopIsFree(MenuEntry *entry);
 void ExpGainEditor(MenuEntry *entry);
 void FriendExpGainEditor(MenuEntry *entry);

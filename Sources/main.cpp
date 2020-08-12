@@ -37,15 +37,16 @@ namespace CTRPluginFramework
 
     void    InitMenu(PluginMenu &menu)
     {
-            menu += EntryWithHotkey(new MenuEntry("All Items", AllItems, "Press the hotkeys to give the current save all items"), Hotkey(Key::L | Key::Up, "All items hotkey") );
-            menu += new MenuEntry("General EXP Multiplier (Current: x1)", nullptr, ExpGainEditor, "Change the General EXP rate using the keyboard icon!");
-            menu += new MenuEntry("Friend EXP Multiplier (Current: x1)", nullptr, FriendExpGainEditor, "Change the Friend EXP rate using the keyboard icon!");
+        menu += new MenuEntry("Shop Is Free", ShopIsFree, "Enabling this cheat makes everything in the shop free and also disregards LBX Crafting Level when buying");
+        menu += EntryWithHotkey(new MenuEntry("All Items", AllItems, "Press the hotkeys to give yourself all items.\n\nNote: for LBX items, this only unlocks them in the shop.\nUse \'Shop Is Free\' to buy them."), Hotkey(Key::L | Key::Up, "All items hotkey"));
+        menu += new MenuEntry("General EXP Multiplier (Current: x1)", nullptr, ExpGainEditor, "Change the General EXP rate using the keyboard icon!");
+        menu += new MenuEntry("Friend EXP Multiplier (Current: x1)", nullptr, FriendExpGainEditor, "Change the Friend EXP rate using the keyboard icon!");
     }
  
     int     main(void)
     {
-        PluginMenu *menu = new PluginMenu("Danball Senki Wars Plugin", 1, 0, 0, \
-                                          "A CTRPF Plugin for Danball Senki Wars\nCommissioned by PHotman\nMade by Slattz");
+        PluginMenu *menu = new PluginMenu("Danball Senki Wars Plugin", 1, 0, 1, \
+                                          "A CTRPF Plugin for Danball Senki Wars\nRequested by PHotman\nMade by Slattz");
 
         // Synnchronize the menu with frame event
         menu->SynchronizeWithFrame(true);
