@@ -18,6 +18,55 @@ typedef int16 s16;
 typedef int32 s32;
 typedef int64 s64;
 
+string LBXCraftingLevelStr(u8 level)
+{
+    string init = "Levels range: 0 -> 12 ; Current: ";
+    u8 lvl = 13;
+
+    if (level > 0x92)
+        lvl = 0;
+
+    else if (level > 0x83)
+        lvl = 1;
+
+    else if (level > 0x74)
+        lvl = 2;
+
+    else if (level > 0x65)
+        lvl = 3;
+
+    else if (level > 0x56)
+        lvl = 4;
+
+    else if (level > 0x47)
+        lvl = 5;
+
+    else if (level > 0x3D)
+        lvl = 6;
+
+    else if (level > 0x33)
+        lvl = 7;
+
+    else if (level > 0x24)
+        lvl = 8;
+
+    else if (level > 0x15)
+        lvl = 9;
+
+    else if (level > 0xB)
+        lvl = 10;
+
+    else if (level > 0x1)
+        lvl = 11;
+
+    else //if (level <= 0x1)
+        lvl = 12;
+
+    string str;
+    SPrintf(str, "%d", lvl);
+    return init+=str;
+}
+
 //STRUCTS
 typedef struct Time_s {
     u32 Year;
@@ -130,7 +179,7 @@ typedef struct SaveStruct
 
     u8 unk55[0x25F8];
     u32 LBXItem_Amounts[5] <comment="1 amount per item category">;
-    //0x12E8C is array of how many items per category we have
+    u8 LBX_CraftingLevel <comment=LBXCraftingLevelStr>;
     u32 lol;
 };
 
