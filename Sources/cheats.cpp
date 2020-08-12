@@ -41,6 +41,10 @@ u32 GetSaveOffset() {
     return 0;
 }
 
+/*
+DISABLED: THE GAME ONLY HAS 256 SLOTS FOR ITEMS, MEANING THERE'S NOT ENOUGH FOR AT LEAST 1 OF EVERY ITEM.
+AS AN ALTERNATIVE, USER 'AllItems' UNLOCKS THE ITEMS. USER THEN USES 'Shop Is Free' TO BUY THE ITEMS THEY WANTED.
+
 u32 g_SetupAddLBXPartsAddr = 0x2BDBD8;
 void __attribute__((naked)) _SetupAddLBXParts(u32 unused, u32 Item, u32 unk_ptr) {
     __asm__ __volatile__(
@@ -76,9 +80,11 @@ void Setup_LBXItem_Inv() {
     }
     Process::Patch(g_SetupAddLBXPartsAddr + 0x30, orig[0]); //Unpatch to keep original game code (unfix bug lol)
 }
+*/
 
 void AllItems(MenuEntry *entry) {
     static constexpr u16 CompleteItem = 0x01FF;
+    static constexpr u16 UnlockedItem = 0x0100;
 
     static bool btn = false;
     if (entry->Hotkeys[0].IsDown() && !btn) {
@@ -103,11 +109,11 @@ void AllItems(MenuEntry *entry) {
             u32 val = 0;
             Process::Read32(offset, val);
             val &= 0xFFFF0000; //get rid of amount and BoughtStatus
-            val |= CompleteItem;
+            val |= UnlockedItem;
             Process::Write32(offset, val);
             offset += 4; //sizeof(val)
         }
-        Setup_LBXItem_Inv(); //Setup inventory for LBX items
+        //Setup_LBXItem_Inv(); //Setup inventory for LBX items
 
         //fill Items_Unk1Items
         for (u32 i = 0; i < Sizes_Unk1Items; i++) {
