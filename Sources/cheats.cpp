@@ -211,28 +211,41 @@ void FriendExpGainEditor(MenuEntry *entry) {
 }
 
 void ShopIsFree(MenuEntry *entry) {
-    constexpr const u32 off_PriceZero = 0x2B8BAC;
+    constexpr const u32 off_LBX_PriceZero = 0x2B8BAC;
+    constexpr const u32 off_Modifiers_PriceZero = 0x2BB04C;
     constexpr const u32 off_IgnoreCraftLevel = 0x2B8C0C;
 
     static bool active = false;
     if (entry->WasJustActivated() && !active) {
-        //Changes code to set all prices to 0 and bypasses the money required check
-        Process::Patch(off_PriceZero, 0xE3A00000); //MOV R0, #0
-        Process::Patch(off_PriceZero+4, 0xE5840008); //STR R0, [R4,#8]
+        //Changes code to set all LBX Item prices to 0 and bypasses the money required check
+        Process::Patch(off_LBX_PriceZero,   0xE3A00000); //MOV R0, #0
+        Process::Patch(off_LBX_PriceZero+4, 0xE5840008); //STR R0, [R4,#8]
+
+        //Changes code to set all Item modifier prices to 0 and bypasses the money required check
+        Process::Patch(off_Modifiers_PriceZero,   0xE3A00000); //MOV R0, #0
+        Process::Patch(off_Modifiers_PriceZero+4, 0xE5840004); //STR R0, [R4,#4]
+        Process::Patch(off_Modifiers_PriceZero+8, 0xEA000002); //B #0x10
 
         //Changes code to not care about 'lbx crafting level'
         Process::Patch(off_IgnoreCraftLevel, 0xE3C00040); //BIC R0, R0, #0x40
+
         OSD::Notify("Shop Is Free: " << Color::Green << "Enabled!");
         active = true;
     }
 
     else if (!entry->IsActivated() && active) {
-        //unpatch 'price is 0'
-        Process::Patch(off_PriceZero, 0xE1500001); //CMP R0, R1
-        Process::Patch(off_PriceZero+4, 0xAA000002); //BGE #0x10
+        //unpatch 'LBX Item price is 0'
+        Process::Patch(off_LBX_PriceZero,   0xE1500001); //CMP R0, R1
+        Process::Patch(off_LBX_PriceZero+4, 0xAA000002); //BGE #0x10
+
+        //unpatch 'Item modifier price is 0'
+        Process::Patch(off_Modifiers_PriceZero,   0xE0811002);  //ADD R1, R1, R2
+        Process::Patch(off_Modifiers_PriceZero+4, 0xE1500001);  //CMP R0, R1
+        Process::Patch(off_Modifiers_PriceZero+8, 0xAA000002); //BGE #0x10
 
         //unpatch 'lbx crafting level doesnt matter'
         Process::Patch(off_IgnoreCraftLevel, 0xE3800040); //ORR R0, R0, #0x40
+
         OSD::Notify("Shop Is Free: " << Color::Red << "Disabled!");
         active = false;
     }
