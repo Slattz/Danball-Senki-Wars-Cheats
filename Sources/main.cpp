@@ -38,7 +38,7 @@ namespace CTRPluginFramework
     void    InitMenu(PluginMenu &menu)
     {
         menu += new MenuEntry("Shop Is Free", ShopIsFree, "Enabling this cheat makes everything in the shop free and also disregards LBX Crafting Level when buying");
-        menu += EntryWithHotkey(new MenuEntry("All Items", AllItems, "Press the hotkeys to give yourself all items.\n\nNote: for LBX items, this only unlocks them in the shop.\nUse \'Shop Is Free\' to buy them."), Hotkey(Key::L | Key::Up, "All items hotkey"));
+        menu += new MenuEntry("All Items", AllItems, "Enable the cheat to give yourself all items.\n\nNote: for LBX items, this only unlocks them in the shop.\nUse \'Shop Is Free\' to buy them.");
         menu += new MenuEntry("General EXP Multiplier (Current: x1)", nullptr, ExpGainEditor, "Change the General EXP rate using the keyboard icon!");
         menu += new MenuEntry("Friend EXP Multiplier (Current: x1)", nullptr, FriendExpGainEditor, "Change the Friend EXP rate using the keyboard icon!");
     }

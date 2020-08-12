@@ -84,15 +84,15 @@ void Setup_LBXItem_Inv() {
 
 void AllItems(MenuEntry *entry) {
     static constexpr u16 CompleteItem = 0x01FF;
-    static constexpr u16 UnlockedItem = 0x0100;
 
-    static bool btn = false;
-    if (entry->Hotkeys[0].IsDown() && !btn) {
-        btn = true;
+    static bool active = false;
+    if (entry->WasJustActivated() && !active) {
+        active = true;
         u32 offset = GetSaveOffset();
         if (offset == 0) {
             OSD::Notify("AllItems: save offset was 0!");
-            return;
+            entry->Disable();
+            active = false;
         }
 
         offset += Offsets_Items;
@@ -109,7 +109,7 @@ void AllItems(MenuEntry *entry) {
             u32 val = 0;
             Process::Read32(offset, val);
             val &= 0xFFFF0000; //get rid of amount and BoughtStatus
-            val |= UnlockedItem;
+            val |= CompleteItem;
             Process::Write32(offset, val);
             offset += 4; //sizeof(val)
         }
@@ -142,10 +142,9 @@ void AllItems(MenuEntry *entry) {
         }
 
         OSD::Notify("All Items received!");
+        entry->Disable();
+        active = false;
     }
-
-    if (!entry->Hotkeys[0].IsDown())
-        btn = false;
 }
 
 #define MIN_EXP 1
